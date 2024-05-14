@@ -21,5 +21,6 @@
 
   <%- @recipe.ingredients.each do |ingredient|%>
     <%= render ingredient %>
+    <%= image_tag ingredient.photo if ingredient.photo.attached? %>
   <% end %>
 </div>
