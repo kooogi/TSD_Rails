@@ -22,9 +22,15 @@ class IngredientsController < ApplicationController
   # POST /ingredients or /ingredients.json
   def create
     @ingredient = Ingredient.new(ingredient_params)
-
+  
     respond_to do |format|
-      if @ingredient.save
+      if @ingredient.recipe.nil?
+        format.html { redirect_to request.referrer, alert: "Can't add ingredient to recipe - The recipe does not exist." }
+        format.json { render json: @ingredient.errors, status: :unprocessable_entity }
+      elsif @ingredient.recipe.ingredients.count >= 3
+        format.html { redirect_to recipe_url(@ingredient.recipe), alert: "A recipe can have at most 3 ingredients." }
+        format.json { render json: @ingredient.errors, status: :unprocessable_entity }
+      elsif @ingredient.save
         format.html { redirect_to recipe_url(@ingredient.recipe), notice: "Ingredient was successfully created." }
         format.json { render :show, status: :created, location: @ingredient }
       else
@@ -33,6 +39,7 @@ class IngredientsController < ApplicationController
       end
     end
   end
+  
 
   # PATCH/PUT /ingredients/1 or /ingredients/1.json
   def update
